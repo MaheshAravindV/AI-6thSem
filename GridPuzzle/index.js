@@ -1,32 +1,33 @@
-size = window.prompt("Size"); //Size should preferably be between 3 and 6 for UI to look good
+import solve from "./AI.js";
 
-board = []; //Board is the current state of the game
-goal = []; //This is the final target state
+let size = window.prompt("Size"); //Size should preferably be between 3 and 6 for UI to look good
+let board = []; //Board is the current state of the game
+let goal = []; //This is the final target state
 
-holerow = size - 1;
-holecol = size - 1; //To keep track of where the hole is
+let holerow = size - 1;
+let holecol = size - 1; //To keep track of where the hole is
 
-for (row = 0; row < size; row++) {
+for (let row = 0; row < size; row++) {
   //Creating the initial state. (We will shuffle in the end)
   board.push([]);
   goal.push([]);
-  for (col = 0; col < size; col++)
+  for (let col = 0; col < size; col++)
     board[row].push(row * size + col + 1), goal[row].push(board[row][col]); //Goal is copied from board as the target is like [[1,2,3],[4,5,6],[7,8,0]]
 }
 
 board[holerow][holecol] = 0;
 goal[holerow][holecol] = 0; //Setting the hole
 
-padding = 60 - (size - 3) * 10; //Padding must be programatically given as smaller cells look better when there are more cells 👇🏻Line 30
+let padding = 60 - (size - 3) * 10; //Padding must be programatically given as smaller cells look better when there are more cells 👇🏻Line 30
 
 async function updateTable(board) {
   //Function to update UI based on the board state
-  var table = document.getElementsByTagName("table")[0];
+  let table = document.getElementsByTagName("table")[0];
   table.innerHTML = "";
   board.forEach((row) => {
-    var newRow = document.createElement("tr");
+    let newRow = document.createElement("tr");
     row.forEach((cell) => {
-      var newCell = document.createElement("td");
+      let newCell = document.createElement("td");
       if (cell != 0) newCell.textContent = cell;
       //If value is 0, means there is a hole there. If not, add text content to the cell
       else newCell.className = "empty-cell";
@@ -39,9 +40,9 @@ async function updateTable(board) {
 
 async function shuffle() {
   //To shuffle the state in the beginning of each run
-  options = ["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"];
-  for (i = 0; i < 100 * (size - 2); i++) {
-    var rand = options[~~(Math.random() * options.length)]; //Randomly picking a move (Sometimes, the picked move is invalid. In that case, nothing happens)
+  let options = ["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"];
+  for (let i = 0; i < 100 * (size - 2); i++) {
+    let rand = options[~~(Math.random() * options.length)]; //Randomly picking a move (Sometimes, the picked move is invalid. In that case, nothing happens)
     window.dispatchEvent(
       new KeyboardEvent("keydown", {
         //Using our own event listener to shuffle by giving moves in a random order
@@ -83,8 +84,11 @@ window.addEventListener("keydown", async (e) => {
         board[holerow][holecol] = 0;
       }
       break;
-    case "r": //r can be pressed to reload the site
+    case "r": //r can be pressed to reload the puzzle
       shuffle();
+      break;
+    case "s": //s can be pressed to make AI solve the puzzle
+      solve({ board: board, holerow: holerow, holecol: holecol }, goal);
       break;
   }
   updateTable(board);
