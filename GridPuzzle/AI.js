@@ -1,22 +1,31 @@
-export default function solve(begin, end) {
+export default function solve(board, end) {
   let visited = new Set();
   let parents = {};
-  parents[JSON.stringify(begin)] = null;
-  let size = begin.board.length;
-  let queue = [begin];
+  parents[JSON.stringify(board)] = null;
+  let size = board.length;
+  let queue = [board];
   let moves = ["ArrowRight", "ArrowDown", "ArrowUp", "ArrowLeft"];
 
-  let temp = "";
   while (queue.length > 0) {
     let curr = queue.pop();
-    if (arrayEq(curr.board, end)) break;
+    if (arrayEq(curr, end)) break;
     if (visited.has(JSON.stringify(curr))) continue;
     visited.add(JSON.stringify(curr));
+
+    let holerow, holecol;
+
+    for (let i = 0; i < size; i++)
+      for (let j = 0; j < size; j++)
+        if (curr[i][j] == 0) {
+          (holerow = i), (holecol = j);
+          break;
+        }
+
     let children = [
-      [curr.holerow, curr.holecol - 1],
-      [curr.holerow - 1, curr.holecol],
-      [curr.holerow + 1, curr.holecol],
-      [curr.holerow, curr.holecol + 1],
+      [holerow, holecol - 1],
+      [holerow - 1, holecol],
+      [holerow + 1, holecol],
+      [holerow, holecol + 1],
     ];
     for (let i = 0; i < 4; i++) {
       let child = children[i];
@@ -27,29 +36,27 @@ export default function solve(begin, end) {
         child[1] >= 0 &&
         child[1] < size
       ) {
-        let newBoard = curr.board.map((arr) => arr.slice());
-        newBoard[curr.holerow][curr.holecol] = curr.board[child[0]][child[1]];
-        newBoard[child[0]][child[1]] = 0;
-        let newState = {
-          board: newBoard,
-          holerow: child[0],
-          holecol: child[1],
-        };
+        let newState = curr.map((arr) => arr.slice());
+        newState[holerow][holecol] = curr[child[0]][child[1]];
+        newState[child[0]][child[1]] = 0;
         if (visited.has(JSON.stringify(newState))) continue;
-        temp = JSON.stringify(newState);
         queue.push(newState);
-        parents[JSON.stringify(newState)] = { parent: curr, move: i };
+        parents[JSON.stringify(newState)] = {
+          parent: JSON.stringify(curr),
+          move: i,
+        };
       }
     }
   }
-  console.log(visited.size);
   let move;
   let stack = [];
+  let curr = JSON.stringify(end);
   while (true) {
+    console.log(curr);
+    if (parents[curr] == null) break;
+    move = parents[curr].move;
     stack.push(moves[move]);
-    if (parents[temp] == undefined) break;
-    move = parents[temp].move;
-    temp = JSON.stringify(parents[temp].parent);
+    curr = parents[curr].parent;
   }
   console.log(stack.length);
   //   while (stack.length > 0) {

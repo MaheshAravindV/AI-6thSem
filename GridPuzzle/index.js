@@ -88,7 +88,7 @@ window.addEventListener("keydown", async (e) => {
       shuffle();
       break;
     case "s": //s can be pressed to make AI solve the puzzle
-      solve({ board: board, holerow: holerow, holecol: holecol }, goal);
+      solve(board, goal);
       break;
   }
   updateTable(board);
