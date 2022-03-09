@@ -1,4 +1,4 @@
-export default function solve(board, end) {
+export default async function solve(board, end) {
   let visited = new Set();
   let parents = {};
   parents[JSON.stringify(board)] = null;
@@ -7,8 +7,11 @@ export default function solve(board, end) {
   let moves = ["ArrowRight", "ArrowDown", "ArrowUp", "ArrowLeft"];
 
   while (queue.length > 0) {
-    let curr = queue.pop();
-    if (arrayEq(curr, end)) break;
+    let curr = queue.shift();
+    if (arrayEq(curr, end)) {
+      console.log("test");
+      break;
+    }
     if (visited.has(JSON.stringify(curr))) continue;
     visited.add(JSON.stringify(curr));
 
@@ -48,28 +51,29 @@ export default function solve(board, end) {
       }
     }
   }
+
   let move;
   let stack = [];
   let curr = JSON.stringify(end);
   while (true) {
-    console.log(curr);
     if (parents[curr] == null) break;
     move = parents[curr].move;
     stack.push(moves[move]);
     curr = parents[curr].parent;
   }
-  console.log(stack.length);
-  //   while (stack.length > 0) {
-  //     let curr = stack.pop();
-  //     console.log(curr);
-  // window.dispatchEvent(
-  //   new KeyboardEvent("keydown", {
-  //     key: curr,
-  //   })
-  // );
-  //   }
+  while (stack.length > 0) {
+    let curr = stack.pop();
+    await sleep(100);
+    window.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: curr,
+      })
+    );
+  }
 }
 
 function arrayEq(a, b) {
   return a.toString() === b.toString();
 }
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
