@@ -90,6 +90,8 @@ window.addEventListener("keydown", async (e) => {
     case "s": //s can be pressed to make AI solve the puzzle
       solve(board, goal);
       break;
+    case "a":
+      solve(board, goal, "A-star");
   }
   updateTable(board);
 });
